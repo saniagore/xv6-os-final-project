@@ -87,6 +87,7 @@ struct proc {
 
   // p->lock must be held when using these:
   enum procstate state;        // Process state
+  int priority;                // NUEVO: prioridad del proceso (1=alta, 10=baja) 
   void *chan;                  // If non-zero, sleeping on chan
   int killed;                  // If non-zero, have been killed
   int xstate;                  // Exit status to be returned to parent's wait

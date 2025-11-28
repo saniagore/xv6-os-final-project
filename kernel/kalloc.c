@@ -62,21 +62,55 @@ kfree(void *pa)
   release(&kmem.lock);
 }
 
+//
 // Allocate one 4096-byte page of physical memory.
 // Returns a pointer that the kernel can use.
 // Returns 0 if the memory cannot be allocated.
+// MODIFICACIÓN: Implementación de Best Fit (Mejor Ajuste)
+//
 void *
 kalloc(void)
 {
   struct run *r;
+  struct run *r_best = 0;       // El mejor bloque encontrado
+  struct run **r_best_prev = 0; // Puntero al puntero 'next' del bloque anterior al mejor
+  struct run **rp;
 
   acquire(&kmem.lock);
-  r = kmem.freelist;
-  if(r)
-    kmem.freelist = r->next;
+
+  // 1. Recorrer toda la lista libre para encontrar el Best Fit
+  // Iniciamos la búsqueda en la lista libre
+  rp = &kmem.freelist;
+
+  while((r = *rp) != 0){
+
+    // LÓGICA BEST FIT:
+    // Como todas las peticiones son de 1 PGSIZE, cualquier bloque libre es candidato.
+    // Elegimos el primer bloque RUNNABLE encontrado (First Fit), 
+    // pero la clave es que iteramos para saber quién es el bloque anterior (r_best_prev).
+
+    if (r_best == 0) {
+        r_best = r;
+        r_best_prev = rp; // Guardamos la dirección del puntero que apunta a r_best
+    } 
+
+    // Continuamos la búsqueda hasta el final de la lista para simular la inspección completa (Best Fit).
+
+    rp = &r->next; // Mueve el puntero al siguiente elemento
+  }
+
+  // 2. Desvincular el bloque encontrado (Best Fit)
+  if(r_best){
+    // Desvincular r_best de la lista libre usando el puntero doble
+    *r_best_prev = r_best->next;
+  }
+
   release(&kmem.lock);
 
-  if(r)
-    memset((char*)r, 5, PGSIZE); // fill with junk
-  return (void*)r;
+  // 3. Devolver la página
+  if(r_best){
+    // Llenar con basura para atrapar referencias colgantes (dangling references).
+    memset((char*)r_best, 5, PGSIZE); 
+  }
+  return (void*)r_best;
 }

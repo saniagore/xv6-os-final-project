@@ -142,7 +142,8 @@ UPROGS=\
 	$U/_zombie\
 	$U/_logstress\
 	$U/_forphan\
-	$U/_dorphan\
+ 	$U/_dorphan\
+        $U/_prioritytest\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
@@ -191,3 +192,7 @@ check-qemu-version:
 		echo "ERROR: Need qemu version >= $(MIN_QEMU_VERSION)"; \
 		exit 1; \
 	fi
+
+
+user/prioritytest: user/prioritytest.c $(ULIB)
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
