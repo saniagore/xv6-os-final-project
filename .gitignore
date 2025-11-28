@@ -1,0 +1,19 @@
+# Archivos de la imagen del sistema de archivos y debug
+fs.img
+
+# Archivos de compilación generados (objetos y binarios)
+*.o
+*.d
+*.sym
+*.asm
+
+# Binarios de la carpeta user/ y mkfs/ generados por Make
+user/_*
+mkfs/mkfs
+
+# El Kernel Compilado y sus Dependencias
+kernel/kernel
+
+# Archivos temporales, de depuración y logs de QEMU
+*.log
+.gdbinit
